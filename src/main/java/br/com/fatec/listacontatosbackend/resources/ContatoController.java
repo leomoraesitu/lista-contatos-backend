@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +46,7 @@ public class ContatoController {
     }
 
     @PostMapping
-    public ResponseEntity<Contato> save(@RequestBody Contato contato){
+    public ResponseEntity<Contato> save(@Validated @RequestBody Contato contato){
 
         Contato newContato = this.service.save(contato);
 

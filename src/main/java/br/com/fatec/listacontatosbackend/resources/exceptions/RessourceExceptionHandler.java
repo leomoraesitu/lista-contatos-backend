@@ -5,7 +5,7 @@ import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -31,6 +31,25 @@ public class RessourceExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
-    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ValidationErrors> validationErrorsException(MethodArgumentNotValidException e, HttpServletRequest request)
+    {
+        ValidationErrors error = new ValidationErrors();
+
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        error.setStatus(status.value());
+        error.setError("Validation Errors");
+        error.setMessage(e.getMessage());
+        error.setTimeStamp(Instant.now());
+        error.setPath(request.getRequestURI());
+
+        e.getBindingResult()
+         .getFieldErrors()
+         .forEach( err -> error.addError(err.getDefaultMessage()));
+
+         return ResponseEntity.status(status).body(error);
+
+    }
 }
 

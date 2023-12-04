@@ -1,10 +1,12 @@
 package br.com.fatec.listacontatosbackend.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "TBL_CONTATO")
@@ -14,12 +16,27 @@ public class Contato {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+
+    @Column(nullable = false)
+    @NotBlank(message = "O nome do Contato não pode estar em branco")
     private String name;
+
+    @NotBlank(message = "O email não pode estar em branco")
     private String email;
+
+    @NotBlank(message = "O Telefone não pode estar em branco")    
     private String telefone;
+
+    @NotBlank(message = "O endereço não pode estar em branco")
     private String endereco;
+
+    @NotBlank(message = "A Cidade não pode estar em branco")
     private String cidade;
+
+    
     private int cep;
+
+    @NotBlank(message = "O Estado não pode estar em branco")  
     private String estado;
 
     
