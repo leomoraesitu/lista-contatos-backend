@@ -38,6 +38,28 @@ public class ContatoService {
         return this.repository.save(contato);
     }
 
+    public void update(int id, Contato contato) {
+        try{
+            Contato aux = repository.getReferenceById(id);
+            aux.setName(contato.getName());
+            aux.setEmail(contato.getEmail());
+            aux.setTelefone(contato.getTelefone());
+            aux.setEndereco(contato.getEndereco());
+            aux.setCidade(contato.getCidade());
+            aux.setCep(contato.getCep());
+            aux.setEstado(contato.getEstado());
+            this.repository.save(aux);
+        }
+        catch(EntityNotFoundException e)
+        {
+            throw new EntityNotFoundException("Contato não cadastrado");
+        }
+        catch(Exception e)
+        {
+            throw new EntityNotFoundException("Erro não identificado");
+        }   
+    }
+
     
 
 
