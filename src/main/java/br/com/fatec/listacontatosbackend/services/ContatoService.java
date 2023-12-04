@@ -59,12 +59,4 @@ public class ContatoService {
             throw new EntityNotFoundException("Erro não identificado");
         }   
     }
-
-    
-
-
-
-
-
-
 }
