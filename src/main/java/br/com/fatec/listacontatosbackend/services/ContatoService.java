@@ -34,6 +34,12 @@ public class ContatoService {
         }
     }
 
+    public Contato save(Contato contato) {
+        return this.repository.save(contato);
+    }
+
+    
+
 
 
 
