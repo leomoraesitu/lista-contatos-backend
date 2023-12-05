@@ -33,8 +33,8 @@ public class Contato {
     @NotBlank(message = "A Cidade não pode estar em branco")
     private String cidade;
 
-    
-    private int cep;
+    @NotBlank(message = "O CEP não pode estar em branco")
+    private String cep;
 
     @NotBlank(message = "O Estado não pode estar em branco")  
     private String estado;
@@ -76,10 +76,10 @@ public class Contato {
     public void setCidade(String cidade) {
         this.cidade = cidade;
     }
-    public int getCep() {
+    public String getCep() {
         return cep;
     }
-    public void setCep(int cep) {
+    public void setCep(String cep) {
         this.cep = cep;
     }
     public String getEstado() {
