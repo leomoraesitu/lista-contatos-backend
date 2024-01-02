@@ -1,6 +1,6 @@
 # Lista de Contatos | Back-End
 
-Projeto de cadastro de contatos desenvolvido para a matéria "Linguagem de Programação WEB" da Fatec Itu.
+Projeto de cadastro de contatos desenvolvido para a matéria "Linguagem de Programação WEB" da [Fatec Itu](https://fatecitu.cps.sp.gov.br/cursos/analise-e-desenvolvimento-de-sistemas/).
 
 Este projeto foi desenvolvido utilizando o Framework [Spring Boot](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.1-Release-Notes) version 3.1.6.
 
