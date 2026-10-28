@@ -9,7 +9,7 @@ O projeto demonstra o caminho entre uma requisição HTTP e o banco de dados, co
 - Cadastro de nome, email, telefone e endereço completo.
 - Listagem de contatos e consulta por identificador.
 - Atualização e exclusão de registros.
-- Validação de campos obrigatórios no cadastro com Bean Validation.
+- Validação de campos obrigatórios no cadastro e na atualização com Bean Validation.
 - Respostas estruturadas para erros de validação e recursos não encontrados.
 
 ## Competências demonstradas
@@ -18,6 +18,7 @@ O projeto demonstra o caminho entre uma requisição HTTP e o banco de dados, co
 - **Organização do backend:** separação entre camada HTTP, serviços e acesso aos dados, com injeção de dependências do Spring.
 - **Persistência relacional:** mapeamento de entidades com JPA, identificadores gerados pelo banco e operações com Spring Data JPA.
 - **Integração full stack:** comunicação em JSON com uma aplicação Angular independente.
+- **Testes automatizados:** integração HTTP com MockMvc e H2, incluindo validação, persistência e contratos de resposta.
 - **Ambiente de desenvolvimento:** execução pelo Maven Wrapper e configuração documentada de runtime e banco local.
 
 ## Tecnologias
@@ -131,7 +132,56 @@ Exemplo de corpo JSON para cadastro ou atualização:
 }
 ```
 
-No cadastro, os campos acima possuem validação `@NotBlank`; violações retornam `422`. A mesma validação ainda não é aplicada ao PUT. Não há validação de formato de email, telefone, CEP ou UF no backend atual. Consultas e exclusões de identificadores inexistentes retornam `404`.
+No cadastro e na atualização, os sete campos acima possuem validação `@NotBlank`;
+valores nulos, vazios ou contendo somente espaços retornam `422`, com mensagens
+na lista `errors`. Uma atualização rejeitada não modifica o registro persistido.
+Não há validação de formato de email, telefone, CEP ou UF no backend atual.
+Consultas e exclusões de identificadores inexistentes retornam `404`; no PUT,
+um identificador inexistente com payload válido também retorna `404`.
+
+## Testes
+
+Na raiz deste repositório, com JDK 21:
+
+```bash
+bash ./mvnw test
+git diff --check
+```
+
+A suíte de integração em
+[ContatoControllerIntegrationTests.java](src/test/java/br/com/fatec/listacontatosbackend/resources/ContatoControllerIntegrationTests.java)
+usa MockMvc com o contexto Spring e o banco H2 `contact-validation-tests`, separado
+do banco local da aplicação. A carga de `data.sql` é desativada nesses testes;
+os contatos são fictícios e cada caso limpa esse banco. Não é necessário iniciar
+a API separadamente nem executar o frontend.
+
+A cobertura inclui:
+
+- POST e PUT com cada um dos sete campos obrigatórios nulo, vazio ou contendo
+  somente espaços: `422` com a mensagem correspondente.
+- Ausência de persistência no POST inválido e preservação do registro no PUT inválido.
+- POST válido: `201`, corpo JSON e cabeçalho `Location`.
+- PUT válido: `200` sem corpo e atualização dos dados no banco.
+- PUT com payload válido e ID inexistente: `404`.
+
+Em **28/10/2026**, `bash ./mvnw test` passou com **46 testes**, sem falhas ou erros:
+45 casos de integração e o teste existente de inicialização do contexto.
+Antes da correção, os 21 casos de atualização inválida retornavam `404` e falhavam.
+`git diff --check` também passou. Essa evidência não inclui teste ponta a ponta
+com a interface Angular; novas alterações de código exigem nova validação.
+
+## Estado da entrega e próximos passos
+
+A correção de validação do PUT, seus testes e esta documentação estão locais na
+branch `fix/contact-update-validation`, baseada na `main` em `f460ffc`, ainda sem
+commit, push ou PR em 28/10/2026. A próxima ação é revisar a entrega para integração.
+
+Após a integração, a próxima etapa proposta é um DTO de entrada sem ID,
+preservando os nomes dos campos, a validação e os contratos HTTP atuais.
+Tratamento de erros internos, injeção por construtor, transações, regras de formato,
+CORS por ambiente, persistência durável e CI continuam pendentes. O plano completo
+e as evidências dos dois repositórios estão no
+[MEMORY.md do frontend](https://github.com/leomoraesitu/lista-contatos-frontend/blob/main/MEMORY.md).
 
 ## Vídeo de apresentação
 
