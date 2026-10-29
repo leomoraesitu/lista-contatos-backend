@@ -2,7 +2,6 @@ package br.com.fatec.listacontatosbackend.services;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.fatec.listacontatosbackend.entities.Contato;
@@ -12,8 +11,11 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class ContatoService {
 
-    @Autowired
-    private ContatoRepository repository;
+    private final ContatoRepository repository;
+
+    public ContatoService(ContatoRepository repository) {
+        this.repository = repository;
+    }
 
     public List<Contato> getContatos() {
         return repository.findAll();

@@ -26,7 +26,7 @@ O projeto demonstra o caminho entre uma requisição HTTP e o banco de dados, co
 
 | Camada | Tecnologias |
 | --- | --- |
-| Backend — este repositório | Java 21, Spring Boot 3.1.6, Spring Web e Bean Validation |
+| Backend — este repositório | Java 21, Spring Boot 4.1.2, Spring Web MVC e Bean Validation |
 | Persistência | Spring Data JPA, H2 em memória e SQL para a carga inicial |
 | Build | Maven 3.9.5 via Maven Wrapper |
 | Frontend — repositório complementar | Angular 16, TypeScript, RxJS e Bootstrap 5 |
@@ -198,19 +198,16 @@ alterações de código exigem nova validação.
 A correção da validação do PUT e seus testes foram integrados à `main` em
 `74a689f` (PR #2).
 
-A entrega atual do DTO de entrada está local na branch `refactor/contact-input-dto`,
-baseada nesse commit, revisada e ainda sem commit, push ou PR em 28/10/2026.
-Inclui o record `ContatoRequest`, adaptação do controller, testes e este README.
-As alterações do serviço são apenas de formatação. Os contratos HTTP foram
-preservados e os 62 testes passaram.
+A entrega do DTO de entrada foi integrada em `8435497` (PR #3), incluindo
+o record `ContatoRequest`, adaptação do controller e os testes de identificação.
 
-A próxima ação é preparar essa entrega para integração quando solicitada,
-incluindo o novo arquivo do DTO no staging explícito. A reconciliação do README
-e da memória do frontend está na branch `docs/reconcile-contact-dto`, sem commit
-ou push. Não há merge automático.
+A manutenção atual atualiza o Spring Boot para 4.1.2, usa injeção por construtor
+no controller e no serviço e adapta os testes ao Jackson 3 e ao Spring Web MVC.
+O agente do Mockito é carregado na inicialização da JVM de testes pelo Maven,
+sem necessidade de parâmetros adicionais no comando `bash ./mvnw test`.
 
-Tratamento de erros internos, injeção por construtor, transações, regras de formato,
-CORS por ambiente, persistência durável e CI continuam pendentes. Após a integração,
+Tratamento de erros internos, transações, regras de formato,
+CORS por ambiente, persistência durável e CI continuam pendentes. Como próxima etapa,
 defina uma etapa pequena para corrigir o tratamento de exceções genéricas do
 serviço, que ainda as converte em recurso não encontrado. O plano completo e as
 evidências dos dois repositórios estão no
