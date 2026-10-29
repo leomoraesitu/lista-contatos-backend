@@ -11,7 +11,8 @@ O projeto demonstra o caminho entre uma requisição HTTP e o banco de dados, co
 - Atualização e exclusão de registros.
 - Validação de campos obrigatórios no cadastro e na atualização com Bean Validation.
 - DTO de entrada sem ID, com identificação gerada no cadastro e definida pela URL na atualização.
-- Respostas estruturadas para erros de validação e recursos não encontrados.
+- Respostas estruturadas para validação (`422`), recurso não encontrado (`404`)
+  e falhas de persistência (`500`), estas últimas implementadas localmente.
 
 ## Competências demonstradas
 
@@ -151,6 +152,28 @@ Não há validação de formato de email, telefone, CEP ou UF no backend atual.
 Consultas e exclusões de identificadores inexistentes retornam `404`; no PUT,
 um identificador inexistente com payload válido também retorna `404`.
 
+### Falhas de persistência
+
+Na entrega local `fix/contact-persistence-errors`, `ContatoService.update()`
+preserva o tratamento de contato inexistente e deixa falhas de persistência
+propagarem. O advice trata `DataAccessException` com status HTTP `500` e o
+seguinte formato de resposta (horário e caminho variam por requisição):
+
+```json
+{
+  "timeStamp": "2026-10-28T12:00:00Z",
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Não foi possível concluir a operação.",
+  "path": "/contatos/1"
+}
+```
+
+A exceção completa é registrada no servidor com mensagem fixa, sem incluir o
+corpo da requisição na mensagem de log. A resposta usa mensagem genérica e não
+expõe SQL ou mensagens internas. O tratamento se aplica às exceções de acesso
+a dados do Spring; não é um handler geral para todos os erros HTTP.
+
 ## Testes
 
 Na raiz deste repositório, com JDK 21:
@@ -181,17 +204,32 @@ A cobertura inclui:
 - Cada um dos sete campos omitido em POST e PUT: `422`, sem criação ou alteração
   indevida de registros.
 
-Em **28/10/2026**, na revisão do DTO, `bash ./mvnw test` com JDK 21 passou com
-**62 testes**, sem falhas, erros ou testes ignorados: 61 casos de integração e o
-teste existente de inicialização do contexto. Os 46 testes anteriores foram
-preservados; foram adicionados dois casos de identificação e 14 de campos omitidos.
-Antes da correção já integrada do PUT, os 21 casos de atualização inválida
-retornavam `404` e falhavam.
+Os testes adicionais são:
 
-Na revisão, `git diff --check` também passou. Nesta reconciliação exclusivamente
-documental, foram consultados os relatórios da execução; a suíte não foi repetida.
-Essa evidência não inclui teste ponta a ponta com a interface Angular; novas
-alterações de código exigem nova validação.
+- `ContatoServiceTests`: dois testes unitários com repositório simulado; o save
+  com falha propaga a mesma instância da exceção, e contato inexistente mantém
+  `EntityNotFoundException` sem tentar gravar.
+- `ContatoPersistenceErrorTests`: dois testes HTTP com MockMvc standalone,
+  controller, serviço e advice reais e repositório simulado. POST e PUT retornam
+  `500` com mensagem genérica, horário e caminho; a resposta não contém a mensagem
+  interna simulada, SQL simulado, trace ou exception.
+
+Para executar somente os quatro novos testes:
+
+```bash
+bash ./mvnw -Dtest=ContatoServiceTests,ContatoPersistenceErrorTests test
+```
+
+Em **28/10/2026**, `bash ./mvnw test` com JDK 21 passou com **66 testes**, sem
+falhas, erros ou ignorados: 61 casos de integração, um teste de contexto,
+dois unitários do serviço e dois HTTP standalone. PUT válido continua retornando
+`200` sem corpo, ID inexistente com payload válido `404` e campos inválidos `422`,
+com o registro original preservado nas atualizações rejeitadas.
+
+Na reconciliação documental, os relatórios dessa execução foram conferidos;
+a suíte não foi repetida porque não houve novas mudanças de código. Os testes
+com repositório simulado não verificam uma indisponibilidade real do banco nem
+o conteúdo do log automaticamente. Não houve teste ponta a ponta com Angular.
 
 ## Estado da entrega e próximos passos
 
@@ -201,16 +239,21 @@ A correção da validação do PUT e seus testes foram integrados à `main` em
 A entrega do DTO de entrada foi integrada em `8435497` (PR #3), incluindo
 o record `ContatoRequest`, adaptação do controller e os testes de identificação.
 
-A manutenção atual atualiza o Spring Boot para 4.1.2, usa injeção por construtor
+O commit `39c1d52` atualiza o Spring Boot para 4.1.2, usa injeção por construtor
 no controller e no serviço e adapta os testes ao Jackson 3 e ao Spring Web MVC.
 O agente do Mockito é carregado na inicialização da JVM de testes pelo Maven,
 sem necessidade de parâmetros adicionais no comando `bash ./mvnw test`.
 
-Tratamento de erros internos, transações, regras de formato,
-CORS por ambiente, persistência durável e CI continuam pendentes. Como próxima etapa,
-defina uma etapa pequena para corrigir o tratamento de exceções genéricas do
-serviço, que ainda as converte em recurso não encontrado. O plano completo e as
-evidências dos dois repositórios estão no
+A branch `fix/contact-persistence-errors` contém alterações locais sem commit:
+remoção da conversão genérica em `404`, handler de `DataAccessException`, log da
+exceção e quatro novos testes, com a suíte de 66 casos aprovada. Os dois arquivos
+novos de testes ainda precisam ser incluídos no staging explícito ao preparar a
+entrega. Commit, push e PR ficam para quando solicitados; não há merge automático.
+
+Transações, regras de formato, CORS por ambiente, persistência durável, CI e
+tratamento geral de erros HTTP continuam pendentes. A próxima ação é revisar e
+preparar a entrega atual para integração. O plano e as evidências dos dois
+repositórios estão no
 [MEMORY.md do frontend](https://github.com/leomoraesitu/lista-contatos-frontend/blob/main/MEMORY.md).
 
 ## Vídeo de apresentação
