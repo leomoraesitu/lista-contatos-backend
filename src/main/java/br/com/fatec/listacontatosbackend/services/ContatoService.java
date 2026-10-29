@@ -51,8 +51,6 @@ public class ContatoService {
             this.repository.save(aux);
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException("Contato não cadastrado");
-        } catch (Exception e) {
-            throw new EntityNotFoundException("Erro não identificado");
         }
     }
 }
