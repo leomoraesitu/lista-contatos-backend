@@ -3,7 +3,6 @@ package br.com.fatec.listacontatosbackend.resources;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,8 +25,11 @@ import br.com.fatec.listacontatosbackend.dto.ContatoRequest;
 @CrossOrigin
 public class ContatoController {
 
-    @Autowired
-    private ContatoService service;
+    private final ContatoService service;
+
+    public ContatoController(ContatoService service) {
+        this.service = service;
+    }
 
     @GetMapping()
     public ResponseEntity<List<Contato>> getContatos() {

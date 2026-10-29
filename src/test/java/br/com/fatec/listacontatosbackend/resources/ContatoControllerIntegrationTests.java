@@ -16,13 +16,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import br.com.fatec.listacontatosbackend.entities.Contato;
 import br.com.fatec.listacontatosbackend.repositories.ContatoRepository;
@@ -71,7 +71,7 @@ class ContatoControllerIntegrationTests {
         mockMvc.perform(post("/contatos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.status").value(422))
                 .andExpect(jsonPath("$.path").value("/contatos"))
                 .andExpect(jsonPath("$.errors", contains(message)));
@@ -93,7 +93,7 @@ class ContatoControllerIntegrationTests {
         mockMvc.perform(put(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.status").value(422))
                 .andExpect(jsonPath("$.path").value(path))
                 .andExpect(jsonPath("$.errors", contains(message)));
@@ -264,7 +264,7 @@ class ContatoControllerIntegrationTests {
         mockMvc.perform(post("/contatos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.status").value(422))
                 .andExpect(jsonPath("$.path").value("/contatos"))
                 .andExpect(jsonPath("$.errors", contains(message)));
@@ -290,7 +290,7 @@ class ContatoControllerIntegrationTests {
         mockMvc.perform(put(path)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.status").value(422))
                 .andExpect(jsonPath("$.path").value(path))
                 .andExpect(jsonPath("$.errors", contains(message)));
