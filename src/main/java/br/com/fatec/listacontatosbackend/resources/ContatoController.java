@@ -19,35 +19,37 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.fatec.listacontatosbackend.entities.Contato;
 import br.com.fatec.listacontatosbackend.services.ContatoService;
+import br.com.fatec.listacontatosbackend.dto.ContatoRequest;
 
 @RestController
 @RequestMapping("contatos")
 @CrossOrigin
 public class ContatoController {
-    
+
     @Autowired
     private ContatoService service;
 
-    
     @GetMapping()
-    public ResponseEntity<List<Contato>> getContatos(){
+    public ResponseEntity<List<Contato>> getContatos() {
         return ResponseEntity.ok(service.getContatos());
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Contato> getContatosbyId(@PathVariable int id){     
+    public ResponseEntity<Contato> getContatosbyId(@PathVariable int id) {
         return ResponseEntity.ok(service.getContatosbyId(id));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteContato(@PathVariable int id){
+    public ResponseEntity<Void> deleteContato(@PathVariable int id) {
         this.service.deleteContatoById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public ResponseEntity<Contato> save(@Validated @RequestBody Contato contato){
+    public ResponseEntity<Contato> save(
+            @Validated @RequestBody ContatoRequest request) {
 
+        Contato contato = toEntity(request);
         Contato newContato = this.service.save(contato);
 
         URI location = ServletUriComponentsBuilder
@@ -60,10 +62,28 @@ public class ContatoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Void> update(@PathVariable int id, @Validated @RequestBody Contato contato){
-        this.service.update(id,contato);
+    public ResponseEntity<Void> update(
+            @PathVariable int id,
+            @Validated @RequestBody ContatoRequest request) {
+
+        Contato contato = toEntity(request);
+        this.service.update(id, contato);
+
         return ResponseEntity.ok().build();
     }
-    
+
+    private Contato toEntity(ContatoRequest request) {
+        Contato contato = new Contato();
+
+        contato.setName(request.name());
+        contato.setEmail(request.email());
+        contato.setTelefone(request.telefone());
+        contato.setEndereco(request.endereco());
+        contato.setCidade(request.cidade());
+        contato.setCep(request.cep());
+        contato.setEstado(request.estado());
+
+        return contato;
+    }
 
 }
